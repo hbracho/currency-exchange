@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: currency-exchange-v1
+  labels:
+    app: currency-exchange-rest
+    tags.datadoghq.com/env: "dev"
+    tags.datadoghq.com/service: "currency-exchange-dd"
+    tags.datadoghq.com/version: "v1.4"      
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: currency-exchange-rest
+  template:
+    metadata:
+      ## namespace: develop
+      labels:
+        app: currency-exchange-rest        
+    spec:
+      containers:
+      - name: currency-exchange
+        #image: gcr.io/sbx-app/currency-exchange:latest
+        image: hbracho/currency-exchange:v1.2
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_ENV
+          value: "dev"
+        - name: DD_SERVICE
+          value: "currency-exchange-dd"
+        - name: DD_VERSION
+          value: "v1.4"        
+        - name: DD_LOGS_INJECTION
+          value: "true"        
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: currency-exchange
+  ## namespace: develop
+spec:
+  selector:
+    app: currency-exchange-rest
+  ports:
+     - port: 8080
+  type: ClusterIP
