@@ -20,7 +20,6 @@ spec:
     spec:
       containers:
       - name: currency-exchange
-        #image: gcr.io/sbx-app/currency-exchange:latest
         image: hbracho/currency-exchange:v1.2
         ports:
         - containerPort: 8080
